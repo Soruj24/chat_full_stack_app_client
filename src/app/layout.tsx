@@ -12,6 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import { Suspense } from "react";
 import Sidebar from "@/components/Sidebar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Providers } from "@/components/Providers";
@@ -42,7 +43,9 @@ export default function RootLayout({
               <div className="flex w-full h-full">
                 <Sidebar />
                 <main className="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-gray-950 relative z-10">
-                  {children}
+                  <Suspense fallback={<div>Loading...</div>}>
+                    {children}
+                  </Suspense>
                 </main>
               </div>
             </div>
