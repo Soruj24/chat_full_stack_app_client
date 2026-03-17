@@ -9,6 +9,7 @@ import {
   markAsRead,
   setActiveChat,
   updateChat,
+  removeMessage,
 } from "@/store/slices/chatSlice";
 import { RootState } from "@/store/store";
 
