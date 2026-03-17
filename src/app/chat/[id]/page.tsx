@@ -3,7 +3,7 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, Suspense } from "react";
 import { setActiveChat } from "@/store/slices/chatSlice";
 import { Lightbox } from "@/components/chat/Lightbox";
 import { ContextMenu } from "@/components/chat/ContextMenu";
@@ -24,7 +24,7 @@ import { useChatInteractions } from "@/hooks/useChatInteractions";
 import { useChatState } from "@/hooks/useChatState";
 import mongoose from "mongoose";
 
-export default function ChatPage() {
+function ChatContent() {
   const { id } = useParams();
   const dispatch = useDispatch();
 
@@ -478,5 +478,13 @@ export default function ChatPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ChatContent />
+    </Suspense>
   );
 }
