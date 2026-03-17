@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginStart, loginSuccess, loginFailure } from "@/store/slices/authSlice";
 import { RootState } from "@/store/store";
 import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
 
 export function AuthContent() {
   const [isLogin, setIsLogin] = useState(true);
@@ -95,8 +96,10 @@ export function AuthContent() {
         });
         const verifyData = await verifyRes.json();
         if (!verifyRes.ok) {
+          toast.error(verifyData.message || "Verification failed");
           throw new Error(verifyData.message || "Verification failed");
         }
+        toast.success("Email verified. Please login.");
         setInfo("Email verified. Please login.");
         setIsOtpStep(false);
         setIsLogin(true);
@@ -115,7 +118,8 @@ export function AuthContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        const msg = data.message || "Something went wrong";
+        const msg = data.message || data.error || "Something went wrong";
+        toast.error(msg);
         if (isLogin && msg.toLowerCase().includes("not active")) {
           setInfo("Account not active. Please verify your email.");
         }
@@ -123,6 +127,7 @@ export function AuthContent() {
       }
 
       if (!isLogin && (data.payload?.requiresVerification || data.requiresVerification)) {
+        toast.info("Verification code sent to your email");
         setIsOtpStep(true);
         setInfo("Enter the 6-digit code sent to your email.");
         setOtpExpiresAt(Date.now() + 60_000);
@@ -142,6 +147,7 @@ export function AuthContent() {
         data.payload?.user?.accessToken ||
         data.token;
 
+      toast.success(isLogin ? "Welcome back!" : "Account created successfully!");
       dispatch(loginSuccess({ user: normalizedUser, token }));
       let redirectTo: string | null = null;
       try {
@@ -283,10 +289,12 @@ export function AuthContent() {
                       });
                       const resData = await res.json();
                       if (res.ok) {
+                        toast.success("Verification code resent!");
                         setInfo("Verification code resent to your email.");
                         setOtpExpiresAt(Date.now() + 60_000);
                         setTimeLeftMs(60_000);
                       } else {
+                        toast.error(resData.message || "Failed to resend code.");
                         setInfo(resData.message || "Failed to resend code.");
                       }
                     }}
